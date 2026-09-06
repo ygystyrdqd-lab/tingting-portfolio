@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+:root { font-family: "Geist Variable", "PingFang SC", "Microsoft YaHei", sans-serif; color: #f0ece5; background: #0b0908; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+* { box-sizing: border-box; }
+html { background: #0b0908; scroll-padding-top: 90px; }
+body { margin: 0; min-width: 320px; overflow-x: hidden; background: #0b0908; }
+button, a { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+::selection { color: #17110d; background: #d0ad7d; }
+@media (prefers-reduced-motion: reduce) { :root { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
