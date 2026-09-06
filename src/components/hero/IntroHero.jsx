@@ -1,4 +1,5 @@
 import { ArrowDown } from 'lucide-react'
+import { assetUrl } from '../../lib/assetUrl'
 import './IntroHero.css'
 
 const introCards = [
@@ -26,7 +27,7 @@ export default function IntroHero() {
             <span className="intro-card__number">{card.number}</span>
             <div className="intro-card__art">
               <img
-                src={card.image}
+                src={assetUrl(card.image)}
                 alt={card.alt}
                 loading="eager"
                 decoding="async"
