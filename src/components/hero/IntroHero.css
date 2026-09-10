@@ -39,6 +39,17 @@
 .intro-hero__scroll{position:absolute;z-index:4;left:50%;bottom:20px;display:flex;align-items:center;gap:8px;transform:translateX(-50%);color:rgba(240,236,229,.42);text-decoration:none;font-size:8px;letter-spacing:.16em}
 .intro-hero__scroll svg{color:var(--champagne)}
 
+@media(min-width:901px){
+  .intro-hero__title{font-size:clamp(64px,7.4vw,108px);white-space:nowrap}
+  .intro-fan{width:min(980px,92vw);height:370px;margin-top:34px}
+  .intro-fan__slot{width:213px}
+  .intro-fan__slot--1{transform:translateX(-414px) translateY(58px) rotate(-16deg)}
+  .intro-fan__slot--2{transform:translateX(-258px) translateY(22px) rotate(-8deg)}
+  .intro-fan__slot--3{width:255px;transform:translateX(-128px) translateY(2px)}
+  .intro-fan__slot--4{transform:translateX(45px) translateY(22px) rotate(8deg)}
+  .intro-fan__slot--5{transform:translateX(202px) translateY(58px) rotate(16deg)}
+}
+
 @media(max-width:900px){
   .intro-hero{padding-top:96px}
   .intro-hero__title{font-size:clamp(50px,9vw,76px)}

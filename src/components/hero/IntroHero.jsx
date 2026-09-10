@@ -16,9 +16,8 @@ export default function IntroHero() {
     <div className="intro-hero__grain" aria-hidden="true" />
     <div className="intro-hero__content">
       <p className="intro-hero__pill" data-intro-pill><i /> VISUAL DESIGNER · CREATIVE MAKER</p>
-      <h1 className="intro-hero__title" aria-label="Designing Visual Experiences">
-        <span className="intro-hero__title-line"><span data-intro-title>Designing</span></span>
-        <span className="intro-hero__title-line"><span data-intro-title>Visual <em>Experiences</em></span></span>
+      <h1 className="intro-hero__title" aria-label="Personal Portfolio">
+        <span className="intro-hero__title-line"><span data-intro-title>PERSONAL <em>PORTFOLIO</em></span></span>
       </h1>
       <p className="intro-hero__copy" data-intro-copy>用策略、审美与新技术，创造清晰而有记忆点的视觉体验。</p>
       <div className="intro-fan" data-intro-fan>

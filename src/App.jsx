@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDown, ArrowUpRight, Mail, Menu, X } from 'lucide-react'
 import SpotlightCard from './components/effects/SpotlightCard'
 import IntroHero from './components/hero/IntroHero'
+import MobileAccessGate from './components/mobile/MobileAccessGate'
 import OpeningOverlay from './components/motion/OpeningOverlay'
 import CapabilityLink from './components/work/CapabilityLink'
 import WorkCategoryPage from './components/work/WorkCategoryPage'
@@ -12,6 +13,7 @@ import './App.css'
 
 const navItems = [['首页', 'home'], ['关于', 'about'], ['作品', 'capabilities'], ['项目', 'projects']]
 const projectClasses = ['project-one', 'project-two', 'project-three']
+const desktopMedia = '(min-width: 768px)'
 
 function AmbientBackground() {
   return <div className="site-ambient" aria-hidden="true"><i className="ambient-gold" /><i className="ambient-wine" /></div>
@@ -193,11 +195,20 @@ function Contact() { return <footer className="contact" id="contact" data-motion
 const readCategorySlug = () => new URLSearchParams(window.location.search).get('category')
 
 export default function App() {
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia(desktopMedia).matches)
   const [categorySlug, setCategorySlug] = useState(readCategorySlug)
   const [suppressHomeOpening, setSuppressHomeOpening] = useState(false)
   const mainPageRef = useRef(null)
   const shouldAnimateHome = categorySlug === null && !suppressHomeOpening
-  usePortfolioAnimations(mainPageRef, shouldAnimateHome)
+  usePortfolioAnimations(mainPageRef, shouldAnimateHome && isDesktop)
+
+  useEffect(() => {
+    const query = window.matchMedia(desktopMedia)
+    const syncViewport = () => setIsDesktop(query.matches)
+    syncViewport()
+    query.addEventListener('change', syncViewport)
+    return () => query.removeEventListener('change', syncViewport)
+  }, [])
 
   useEffect(() => {
     const syncRoute = () => {
@@ -236,6 +247,8 @@ export default function App() {
     window.history.pushState({}, '', url)
     setCategorySlug(null)
   }
+
+  if (!isDesktop) return <MobileAccessGate />
 
   if (categorySlug !== null) return <><AmbientBackground /><WorkCategoryPage key={categorySlug} category={getWorkCategory(categorySlug)} onBack={closeCategory} /></>
 
