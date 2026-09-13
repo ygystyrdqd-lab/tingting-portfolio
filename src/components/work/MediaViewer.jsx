@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 export default function MediaViewer({ project, onClose }) {
@@ -18,7 +19,7 @@ export default function MediaViewer({ project, onClose }) {
 
   if (!project) return null
 
-  return <div
+  return createPortal(<div
     className="media-viewer"
     role="dialog"
     aria-modal="true"
@@ -46,5 +47,5 @@ export default function MediaViewer({ project, onClose }) {
         })}
       </div>
     </div>
-  </div>
+  </div>, document.body)
 }

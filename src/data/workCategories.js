@@ -3,29 +3,6 @@ import { assetUrl } from '../lib/assetUrl'
 const rawWorkCategories = [
   {
     number: '01',
-    slug: 'brand',
-    title: '品牌视觉设计',
-    en: 'Brand Visual',
-    description: '围绕品牌定位建立识别系统、视觉语言与跨媒介一致性。',
-    theme: { accent: '#d0ad7d', glow: 'rgba(208,173,125,.22)' },
-    projects: [
-      {
-        id: 'brand-01',
-        title: '深圳市细胞治疗技术协会VIS',
-        meta: 'IDENTITY · VISUAL SYSTEM',
-        cover: '/work/brand-01/cover.webp',
-        media: [
-          {
-            type: 'image',
-            src: '/work/brand-01/detail-01.webp',
-            alt: '深圳市细胞治疗技术协会视觉识别系统作品详情',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    number: '02',
     slug: 'ecommerce',
     title: '产品视觉设计',
     en: 'Product Visual',
@@ -68,6 +45,29 @@ const rawWorkCategories = [
             type: 'image',
             src: '/work/ecommerce-03/detail-01.webp',
             alt: 'AOC K1S Ultra 投影仪电商视觉详情',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    number: '02',
+    slug: 'brand',
+    title: '品牌视觉设计',
+    en: 'Brand Visual',
+    description: '围绕品牌定位建立识别系统、视觉语言与跨媒介一致性。',
+    theme: { accent: '#d0ad7d', glow: 'rgba(208,173,125,.22)' },
+    projects: [
+      {
+        id: 'brand-01',
+        title: '深圳市细胞治疗技术协会VIS',
+        meta: 'IDENTITY · VISUAL SYSTEM',
+        cover: '/work/brand-01/cover.webp',
+        media: [
+          {
+            type: 'image',
+            src: '/work/brand-01/detail-01.webp',
+            alt: '深圳市细胞治疗技术协会视觉识别系统作品详情',
           },
         ],
       },
@@ -176,6 +176,19 @@ const rawWorkCategories = [
           },
         ],
       },
+      {
+        id: 'aigc-video-03',
+        title: '瑞美亚精华液广告2',
+        meta: 'AIGC · BEAUTY AD',
+        cover: '/work/aigc-video-03/cover.webp',
+        media: [
+          {
+            type: 'video',
+            src: '/work/aigc-video-03/video.mp4',
+            poster: '/work/aigc-video-03/cover.webp',
+          },
+        ],
+      },
     ],
   },
 ]
@@ -224,18 +237,37 @@ const rawFeaturedWorkCategories = [
   {
     number: '03',
     slug: 'aigc-workflow',
-    title: 'AIGC工作流',
-    en: 'AIGC Workflow',
-    description: '将生成式工具融入创意、制作与迭代流程，拓展视觉表达效率。',
+    title: '瑞美亚面霜广告',
+    en: 'AIGC Beauty Advertisement',
+    description: '瑞美亚面霜广告视觉与视频展示。',
     theme: { accent: '#a98ca8', glow: 'rgba(126,82,126,.24)' },
     projects: [
       {
-        id: 'aigc-workflow-01',
-        title: 'AI空间场景生成工作流',
-        meta: 'AIGC · CREATIVE WORKFLOW',
-        cover: '/work/aigc-workflow-01/cover.webp',
+        id: 'remeya-cream-ad',
+        title: '瑞美亚面霜广告',
+        meta: 'AIGC · BEAUTY AD',
+        cover: '/work/remeya-cream/cover.jpg',
         media: [
-          { type: 'image', src: '/work/aigc-workflow-01/detail-01.webp', alt: 'AI空间场景生成与合成工作流详情' },
+          { type: 'video', src: '/work/remeya-cream/ad.mp4', poster: '/work/remeya-cream/cover.jpg' },
+        ],
+      },
+    ],
+  },
+  {
+    number: '04',
+    slug: 'immune-cell-science',
+    title: '免疫细胞科普（身体里的接力赛）',
+    en: 'Immune Cell Science Film',
+    description: '免疫细胞科普短片的影像展示。',
+    theme: { accent: '#c7a071', glow: 'rgba(199,160,113,.22)' },
+    projects: [
+      {
+        id: 'immune-cell-science-01',
+        title: '免疫细胞科普（身体里的接力赛）',
+        meta: 'SCIENCE · SHORT FILM',
+        cover: '/work/immune-cell-science/cover.webp',
+        media: [
+          { type: 'video', src: '/work/immune-cell-science/film.mp4', poster: '/work/immune-cell-science/cover.webp' },
         ],
       },
     ],

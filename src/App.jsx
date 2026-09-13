@@ -5,6 +5,7 @@ import IntroHero from './components/hero/IntroHero'
 import MobileAccessGate from './components/mobile/MobileAccessGate'
 import OpeningOverlay from './components/motion/OpeningOverlay'
 import CapabilityLink from './components/work/CapabilityLink'
+import MediaViewer from './components/work/MediaViewer'
 import WorkCategoryPage from './components/work/WorkCategoryPage'
 import { featuredWorkCategories, getWorkCategory, workCategories } from './data/workCategories'
 import { assetUrl } from './lib/assetUrl'
@@ -12,7 +13,7 @@ import { usePortfolioAnimations } from './hooks/usePortfolioAnimations'
 import './App.css'
 
 const navItems = [['首页', 'home'], ['关于', 'about'], ['作品', 'capabilities'], ['项目', 'projects']]
-const projectClasses = ['project-one', 'project-two', 'project-three']
+const projectClasses = ['project-one', 'project-two', 'project-three', 'project-four']
 const desktopMedia = '(min-width: 768px)'
 
 function AmbientBackground() {
@@ -49,6 +50,7 @@ function HeroAvatar() {
   const avatarImageRef = useRef(null)
   const frameRef = useRef(0)
   const [imageFailed, setImageFailed] = useState(false)
+  const [isFramingActive, setIsFramingActive] = useState(false)
 
   useEffect(() => () => window.cancelAnimationFrame(frameRef.current), [])
 
@@ -97,6 +99,7 @@ function HeroAvatar() {
 
   const handlePointerMove = (event) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce), (pointer: coarse)').matches) return
+    setIsFramingActive(true)
     const node = avatarRef.current
     if (!node) return
     window.cancelAnimationFrame(frameRef.current)
@@ -118,6 +121,7 @@ function HeroAvatar() {
   }
 
   const resetPointer = () => {
+    setIsFramingActive(false)
     const node = avatarRef.current
     if (!node) return
     const hero = node.closest('.hero')
@@ -131,13 +135,23 @@ function HeroAvatar() {
     hero?.style.setProperty('--hero-y', '0px')
   }
 
-  return <div ref={avatarRef} className="hero-avatar" onPointerMove={handlePointerMove} onPointerLeave={resetPointer}>
+  return <div ref={avatarRef} className={`hero-avatar${isFramingActive ? ' is-framing-active' : ''}`} onPointerEnter={() => setIsFramingActive(true)} onPointerMove={handlePointerMove} onPointerLeave={resetPointer}>
     <div className="avatar-opening-layer" data-profile-avatar>
       <ParticleField />
       <div className="avatar-aura" aria-hidden="true" />
       <div className="avatar-orbits" aria-hidden="true"><i /><i /><span>PERSONAL / 3D</span></div>
+      {!imageFailed && <div className="avatar-viewfinder" aria-hidden="true">
+        <i className="viewfinder-corner viewfinder-corner-tl" />
+        <i className="viewfinder-corner viewfinder-corner-tr" />
+        <i className="viewfinder-corner viewfinder-corner-br" />
+        <i className="viewfinder-corner viewfinder-corner-bl" />
+        <span className="viewfinder-reticle" />
+        <span className="viewfinder-scan" />
+        <span className="viewfinder-touch viewfinder-touch-left" />
+        <span className="viewfinder-touch viewfinder-touch-right" />
+      </div>}
       <div className="avatar-stage">
-        {imageFailed ? <div className="avatar-fallback" aria-label="个人3D形象暂不可用">LT</div> : <img ref={avatarImageRef} src={assetUrl('hero-avatar-closeup.png')} alt="廖婷婷的个人3D半身形象" onError={() => setImageFailed(true)} />}
+        {imageFailed ? <div className="avatar-fallback" aria-label="个人3D形象暂不可用">LT</div> : <img ref={avatarImageRef} src={assetUrl('hero-avatar-framing.png')} alt="廖婷婷以双手构成取景框的个人形象" onError={() => setImageFailed(true)} />}
       </div>
       <div className="avatar-ground" aria-hidden="true" />
       <div className="avatar-caption"><span>PERSONAL DIGITAL TWIN</span><span>HOVER TO INTERACT</span></div>
@@ -156,10 +170,91 @@ function Hero() {
   </section>
 }
 
+function InteractiveAboutPortrait() {
+  const cardRef = useRef(null)
+  const imageRef = useRef(null)
+  const contactLatch = useRef(false)
+  const [isContact, setIsContact] = useState(false)
+  const [rippleKey, setRippleKey] = useState(0)
+
+  const handlePointerMove = (event) => {
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return
+
+    const card = cardRef.current
+    const image = imageRef.current
+    if (!card || !image) return
+
+    const cardRect = card.getBoundingClientRect()
+    const imageRect = image.getBoundingClientRect()
+    const pointerX = event.clientX - cardRect.left
+    const pointerY = event.clientY - cardRect.top
+    const hotspotX = imageRect.left - cardRect.left + imageRect.width * .24
+    const hotspotY = imageRect.top - cardRect.top + imageRect.height * .34
+    const distance = Math.hypot(pointerX - hotspotX, pointerY - hotspotY)
+    const contactRadius = Math.min(cardRect.width, cardRect.height) * .09
+    const proximity = Math.max(0, 1 - distance / (contactRadius * 2.4))
+    const touching = distance <= contactRadius
+
+    card.style.setProperty('--pointer-x', `${pointerX}px`)
+    card.style.setProperty('--pointer-y', `${pointerY}px`)
+    card.style.setProperty('--hotspot-x', `${hotspotX}px`)
+    card.style.setProperty('--hotspot-y', `${hotspotY}px`)
+    card.style.setProperty('--contact-strength', proximity.toFixed(3))
+    card.style.setProperty('--pointer-glow-opacity', (proximity * .7).toFixed(3))
+    card.style.setProperty('--core-opacity', (.18 + proximity * .82).toFixed(3))
+    card.style.setProperty('--core-scale', (.72 + proximity * .36).toFixed(3))
+
+    if (touching && !contactLatch.current) {
+      contactLatch.current = true
+      setIsContact(true)
+      setRippleKey((key) => key + 1)
+    } else if (!touching && contactLatch.current) {
+      contactLatch.current = false
+      setIsContact(false)
+    }
+  }
+
+  const handlePointerLeave = () => {
+    const card = cardRef.current
+    contactLatch.current = false
+    setIsContact(false)
+    card?.style.setProperty('--contact-strength', '0')
+    card?.style.setProperty('--pointer-glow-opacity', '0')
+    card?.style.setProperty('--core-opacity', '.18')
+    card?.style.setProperty('--core-scale', '.72')
+  }
+
+  return <div
+    ref={cardRef}
+    className={`about-portrait-card${isContact ? ' is-fingertip-contact' : ''}`}
+    data-reveal-media
+    onPointerMove={handlePointerMove}
+    onPointerLeave={handlePointerLeave}
+  >
+    <div className="portrait-orbit" aria-hidden="true" />
+    <div className="about-pointer-glow" aria-hidden="true" />
+    <div className="about-portrait-parallax" data-parallax>
+      <img ref={imageRef} className="about-portrait-image" src={assetUrl('about-portrait-user.png')} alt="廖婷婷伸手与访客互动的个人形象" />
+    </div>
+    <div className="about-fingertip-fx" aria-hidden="true">
+      {rippleKey > 0 && <div className="about-fingertip-ripples" key={rippleKey}>
+        <i className="about-fingertip-ripple" />
+        <i className="about-fingertip-ripple" />
+        <i className="about-fingertip-ripple" />
+      </div>}
+      <i className="about-fingertip-core" />
+    </div>
+    <span className="portrait-label">PERSONAL ID / INTERACTIVE PORTRAIT</span>
+  </div>
+}
+
 function About() { return <section className="about section-dark" id="about" data-motion-section="about"><div className="section-shell">
   <div className="section-kicker"><span>( 01 )</span><span>ABOUT ME</span><span>SHENZHEN · CHINA</span></div>
-  <h2 data-section-title="about">ABOUT<br /><em>ME</em></h2>
-  <div className="about-grid"><div className="about-portrait-card" data-reveal-media><div className="portrait-orbit" aria-hidden="true" /><div className="about-portrait-parallax" data-parallax><img className="about-portrait-image" src={assetUrl('about-portrait.png')} alt="廖婷婷的个人3D形象" /></div><span className="portrait-label">PERSONAL PORTRAIT / 3D</span></div>
+  <h2 className="editorial-title editorial-title-about" data-section-title="about">
+    <span className="editorial-title-line">ABOUT</span>
+    <span className="editorial-title-line editorial-title-second">ME<span className="editorial-title-period">.</span></span>
+  </h2>
+  <div className="about-grid"><InteractiveAboutPortrait />
     <div className="about-copy" data-stagger-group><p className="about-lead" data-stagger-item>我是一名拥有 <strong>10 年</strong>商业设计经验的视觉设计师，关注品牌与内容如何在不同媒介中保持统一、清晰并产生情绪。</p>
       <p data-stagger-item>从品牌视觉、电商营销到三维与 AIGC，我习惯把审美判断、业务目标和执行效率放在同一个设计系统里思考。</p>
       <div className="about-facts"><div data-stagger-item><span>EXPERIENCE</span><strong>10 YEARS</strong></div><div data-stagger-item><span>EDUCATION</span><strong>BACHELOR</strong></div><div data-stagger-item><span>BASE</span><strong>SHENZHEN</strong></div><div data-stagger-item><span>EMAIL</span><a href="mailto:806779987@qq.com">806779987@qq.com</a></div></div>
@@ -168,27 +263,36 @@ function About() { return <section className="about section-dark" id="about" dat
 
 function Capabilities({ onOpenCategory }) { return <section className="capabilities" id="capabilities" data-motion-section="capabilities"><div className="section-shell">
   <div className="section-kicker dark-text"><span>( 02 )</span><span>WHAT I DO</span><span>SELECTED SKILLS</span></div>
-  <div className="capability-intro"><h2 data-section-title="capabilities">SELECTED<br />WORKS</h2><p data-capability-intro>从策略到落地，建立兼顾品牌一致性与传播效率的视觉表达。</p></div>
+  <div className="capability-intro"><h2 className="editorial-title editorial-title-works" data-section-title="capabilities">
+    <span className="editorial-title-line">SELECTED</span>
+    <span className="editorial-title-line editorial-title-second">WORKS<span className="editorial-title-period">.</span></span>
+  </h2><p data-capability-intro>从策略到落地，建立兼顾品牌一致性与传播效率的视觉表达。</p></div>
   <div className="capability-list">{workCategories.map((category) => <CapabilityLink category={category} onOpen={onOpenCategory} key={category.slug} />)}</div>
 </div></section> }
 
-function Projects({ onOpenCategory }) {
-  const handleOpen = (event, slug) => {
-    event.preventDefault()
-    onOpenCategory(slug)
+function Projects() {
+  const [selectedProject, setSelectedProject] = useState(null)
+
+  const handleOpen = (category, index) => {
+    setSelectedProject({
+      ...category.projects[0],
+      number: String(index + 1).padStart(2, '0'),
+    })
   }
 
-  return <section className="projects" id="projects" data-motion-section="projects"><div className="section-shell projects-heading">
-  <div className="section-kicker"><span>( 03 )</span><span>SELECTED WORK</span><span>2024 — 2026</span></div><h2 data-section-title="projects">PROJECTS<span>.</span></h2>
+  return <><section className="projects" id="projects" data-motion-section="projects"><div className="section-shell projects-heading">
+  <div className="section-kicker"><span>( 03 )</span><span>SELECTED WORK</span><span>2024 — 2026</span></div><h2 className="editorial-title editorial-title-projects" data-section-title="projects">
+    <span className="editorial-title-live">PROJECTS<span className="editorial-title-period">.</span></span>
+  </h2>
   <p data-project-intro>当前使用概念视觉占位，后续替换为真实项目封面与案例内容。</p></div>
-  <div className="project-stack section-shell">{featuredWorkCategories.map((project, index) => <SpotlightCard as="a" className={`project-card ${projectClasses[index]}`} data-project-card href={`?category=${project.slug}`} onClick={(event) => handleOpen(event, project.slug)} aria-label={`查看${project.title}项目`} key={project.slug} style={{ '--index': index }}>
+  <div className="project-stack section-shell">{featuredWorkCategories.map((project, index) => <SpotlightCard as="button" type="button" className={`project-card ${projectClasses[index]}`} data-project-card onClick={() => handleOpen(project, index)} aria-label={`浏览${project.projects[0].title}作品`} key={project.slug} style={{ '--index': index }}>
     <div className="project-meta"><span>{project.number}</span><span>{project.projects[0].meta}</span></div><div className={`project-art${project.projects[0].cover ? ' has-cover' : ''}`} data-reveal-media><div className="project-art-inner" data-parallax>{project.projects[0].cover ? <img src={project.projects[0].cover} alt="" loading="lazy" decoding="async" /> : <><div className="shape shape-one" /><div className="shape shape-two" /><div className="shape shape-three" /></>}</div><span>PROJECT PREVIEW</span></div>
     <div className="project-footer"><h3>{project.title}</h3><span aria-hidden="true"><ArrowUpRight /></span></div>
   </SpotlightCard>)}</div>
-</section> }
+</section><MediaViewer project={selectedProject} onClose={() => setSelectedProject(null)} /></> }
 
 function Contact() { return <footer className="contact" id="contact" data-motion-section="contact"><i className="contact-motion-wipe" data-contact-wipe aria-hidden="true" /><div className="contact-top"><span data-stagger-item>AVAILABLE FOR SELECTED PROJECTS</span><span data-stagger-item>© 2026</span></div>
-  <div className="contact-center"><p data-contact-intro>有一个想法，或一个值得被看见的项目？</p><a href="mailto:806779987@qq.com" data-section-title="contact"><span className="contact-line"><span data-contact-line-inner>LET&apos;S</span></span><span className="contact-line"><em><span data-contact-line-inner>TALK</span></em></span><span className="contact-arrow" data-contact-arrow><ArrowUpRight /></span></a></div>
+  <div className="contact-center"><p data-contact-intro>有一个想法，或一个值得被看见的项目？</p><a href="mailto:806779987@qq.com" data-section-title="contact"><span className="contact-line"><span data-contact-line-inner>LET&apos;S</span></span><span className="contact-line"><em><span data-contact-line-inner>TALK</span></em></span></a></div>
   <div className="contact-bottom"><span data-stagger-item>LIAO TINGTING · VISUAL DESIGNER</span><a href="mailto:806779987@qq.com" data-stagger-item><Mail size={16} /> 806779987@qq.com</a><a href="#home" data-stagger-item>BACK TO TOP ↑</a></div>
 </footer> }
 
@@ -252,5 +356,5 @@ export default function App() {
 
   if (categorySlug !== null) return <><AmbientBackground /><WorkCategoryPage key={categorySlug} category={getWorkCategory(categorySlug)} onBack={closeCategory} /></>
 
-  return <div className="portfolio-page" ref={mainPageRef}><OpeningOverlay /><AmbientBackground /><Header /><main><IntroHero /><Hero /><About /><Capabilities onOpenCategory={openCategory} /><Projects onOpenCategory={openCategory} /></main><Contact /></div>
+  return <div className="portfolio-page" ref={mainPageRef}><OpeningOverlay /><AmbientBackground /><Header /><main><IntroHero /><Hero /><About /><Capabilities onOpenCategory={openCategory} /><Projects /></main><Contact /></div>
 }

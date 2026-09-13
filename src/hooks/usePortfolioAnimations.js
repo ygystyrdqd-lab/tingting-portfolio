@@ -179,7 +179,6 @@ export function usePortfolioAnimations(rootRef, enabled) {
             .from('[data-contact-line-inner]', { yPercent: 115, duration: 1.05, stagger: .12, ease: 'power4.out' }, .2)
             .from('[data-contact-intro]', { y: 24, autoAlpha: 0, duration: .65, ease: 'power3.out' }, .48)
             .from(contact.querySelectorAll('[data-stagger-item]'), { y: 22, autoAlpha: 0, duration: .7, stagger: .08, ease: 'power3.out' }, .58)
-            .from('[data-contact-arrow]', { rotation: -35, scale: .8, autoAlpha: 0, duration: .85, ease: 'power3.out' }, .64)
         }
       })
     } catch {
