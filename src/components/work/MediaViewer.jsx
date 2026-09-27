@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import DeferredVideo from './DeferredVideo'
 
 export default function MediaViewer({ project, onClose }) {
   useEffect(() => {
@@ -35,13 +36,11 @@ export default function MediaViewer({ project, onClose }) {
         {project.media.length === 0 && <div className="media-empty"><i /><p>作品媒体将在后续上传</p><span>IMAGE / VIDEO READY</span></div>}
         {project.media.map((media, index) => {
           if (media.type === 'image') return <img key={`${media.src}-${index}`} src={media.src} alt={media.alt || project.title} />
-          if (media.type === 'video') return <video
+          if (media.type === 'video') return <DeferredVideo
             key={`${media.src}-${index}`}
             src={media.src}
             poster={media.poster}
-            preload="metadata"
-            controls
-            playsInline
+            title={project.title}
           />
           return null
         })}

@@ -14,8 +14,6 @@ dist-ssr
 .env*
 !.env.example
 .superpowers/
-public/work/aigc-video-01/video.mp4
-public/work/aigc-video-02/video.mp4
 
 # Editor directories and files
 .vscode/*

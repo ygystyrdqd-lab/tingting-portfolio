@@ -11,7 +11,8 @@
     "verify:desktop-experience": "node scripts/verify-desktop-experience.mjs",
     "verify:remeya-project": "node scripts/verify-remeya-project.mjs",
     "verify:about-portrait": "node scripts/verify-about-portrait-interaction.mjs",
-    "verify:hero-framing": "node scripts/verify-hero-framing-avatar.mjs"
+    "verify:hero-framing": "node scripts/verify-hero-framing-avatar.mjs",
+    "verify:video-loading": "node scripts/verify-video-loading.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

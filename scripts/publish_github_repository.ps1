@@ -44,10 +44,7 @@ $rootFiles = @(
   'package.json', 'pnpm-lock.yaml', 'tsconfig.json', 'vite.config.js'
 )
 $rootDirectories = @('.github', 'docs', 'public', 'scripts', 'src')
-$externalMediaPaths = @(
-  'public/work/aigc-video-01/video.mp4',
-  'public/work/aigc-video-02/video.mp4'
-)
+$externalMediaPaths = @()
 $files = @()
 foreach ($relativePath in $rootFiles) {
   $absolutePath = Join-Path $resolvedRoot $relativePath

@@ -158,7 +158,7 @@ const rawWorkCategories = [
         media: [
           {
             type: 'video',
-            src: 'https://github.com/ygystyrdqd-lab/tingting-portfolio/releases/download/media-v1/aigc-video-01.mp4',
+            src: '/work/aigc-video-01/video.mp4',
             poster: '/work/aigc-video-01/cover.webp',
           },
         ],
@@ -171,7 +171,7 @@ const rawWorkCategories = [
         media: [
           {
             type: 'video',
-            src: 'https://github.com/ygystyrdqd-lab/tingting-portfolio/releases/download/media-v1/aigc-video-02.mp4',
+            src: '/work/aigc-video-02/video.mp4',
             poster: '/work/aigc-video-02/cover.webp',
           },
         ],
