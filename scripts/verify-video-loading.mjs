@@ -25,24 +25,25 @@ assert(!deferred.includes("if (!requested || status === 'error') return"), 'Post
 assert(deferred.includes('加载视频'), 'Poster state must have an explicit play action')
 assert(deferred.includes('重新加载'), 'Video failures must expose retry')
 assert(!data.includes('github.com/ygystyrdqd-lab/tingting-portfolio/releases'), 'Videos must use same-origin paths')
+assert((data.match(/\.web\.mp4/g) || []).length === 6, 'All six portfolio videos must use low-bandwidth streaming previews')
 
 const videos = [
-  'public/work/3d-01/video.mp4',
-  'public/work/aigc-video-01/video.mp4',
-  'public/work/aigc-video-02/video.mp4',
-  'public/work/aigc-video-03/video.mp4',
-  'public/work/remeya-cream/ad.mp4',
-  'public/work/immune-cell-science/film.mp4',
+  'public/work/3d-01/video.web.mp4',
+  'public/work/aigc-video-01/video.web.mp4',
+  'public/work/aigc-video-02/video.web.mp4',
+  'public/work/aigc-video-03/video.web.mp4',
+  'public/work/remeya-cream/ad.web.mp4',
+  'public/work/immune-cell-science/film.web.mp4',
 ]
 
 const mebibyte = 1024 * 1024
 const maxBytesByVideo = new Map([
-  ['public/work/3d-01/video.mp4', 8 * mebibyte],
-  ['public/work/aigc-video-01/video.mp4', 8 * mebibyte],
-  ['public/work/aigc-video-02/video.mp4', 8 * mebibyte],
-  ['public/work/aigc-video-03/video.mp4', 8 * mebibyte],
-  ['public/work/remeya-cream/ad.mp4', 8 * mebibyte],
-  ['public/work/immune-cell-science/film.mp4', 18 * mebibyte],
+  ['public/work/3d-01/video.web.mp4', 1.5 * mebibyte],
+  ['public/work/aigc-video-01/video.web.mp4', 1.5 * mebibyte],
+  ['public/work/aigc-video-02/video.web.mp4', 1.5 * mebibyte],
+  ['public/work/aigc-video-03/video.web.mp4', 1.5 * mebibyte],
+  ['public/work/remeya-cream/ad.web.mp4', 2 * mebibyte],
+  ['public/work/immune-cell-science/film.web.mp4', 4 * mebibyte],
 ])
 
 let totalBytes = 0
@@ -52,6 +53,6 @@ for (const video of videos) {
   assert(size <= maxBytes, `${video} exceeds its ${maxBytes / mebibyte}MiB web-preview budget`)
   totalBytes += size
 }
-assert(totalBytes <= 50 * mebibyte, 'Published video previews exceed the 50MiB total budget')
+assert(totalBytes <= 12 * mebibyte, 'Published streaming previews exceed the 12MiB total budget')
 
 console.log('Video loading verification passed')
