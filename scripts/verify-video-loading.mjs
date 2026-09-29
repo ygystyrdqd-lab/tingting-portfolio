@@ -35,12 +35,23 @@ const videos = [
   'public/work/immune-cell-science/film.mp4',
 ]
 
+const mebibyte = 1024 * 1024
+const maxBytesByVideo = new Map([
+  ['public/work/3d-01/video.mp4', 8 * mebibyte],
+  ['public/work/aigc-video-01/video.mp4', 8 * mebibyte],
+  ['public/work/aigc-video-02/video.mp4', 8 * mebibyte],
+  ['public/work/aigc-video-03/video.mp4', 8 * mebibyte],
+  ['public/work/remeya-cream/ad.mp4', 8 * mebibyte],
+  ['public/work/immune-cell-science/film.mp4', 18 * mebibyte],
+])
+
 let totalBytes = 0
 for (const video of videos) {
   const { size } = await stat(resolve(root, video))
-  assert(size < 100 * 1024 * 1024, `${video} exceeds GitHub's 100MiB limit`)
+  const maxBytes = maxBytesByVideo.get(video)
+  assert(size <= maxBytes, `${video} exceeds its ${maxBytes / mebibyte}MiB web-preview budget`)
   totalBytes += size
 }
-assert(totalBytes <= 156_514_557, 'Published videos did not meet the 35% reduction target')
+assert(totalBytes <= 50 * mebibyte, 'Published video previews exceed the 50MiB total budget')
 
 console.log('Video loading verification passed')
