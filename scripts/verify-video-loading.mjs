@@ -7,10 +7,11 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message)
 }
 
-const [viewer, deferred, data] = await Promise.all([
+const [viewer, deferred, data, config] = await Promise.all([
   read('src/components/work/MediaViewer.jsx'),
   read('src/components/work/DeferredVideo.jsx'),
   read('src/data/workCategories.js'),
+  read('src/config/videoAssets.js'),
 ])
 
 assert(viewer.includes('<DeferredVideo'), 'MediaViewer must delegate video rendering')
@@ -20,12 +21,19 @@ assert(deferred.includes('useRef'), 'Deferred video must keep a stable native vi
 assert(deferred.includes('videoRef.current'), 'Playback must use the mounted video element')
 assert(deferred.includes('.load()'), 'Click playback must explicitly start resource loading')
 assert(deferred.includes('.play()'), 'Click playback must explicitly request playback')
+assert(deferred.includes('useEffect'), 'Deferred video must release its media connection when closed')
+assert(deferred.includes("removeAttribute('src')"), 'Closing the viewer must detach the previous video source')
+assert(deferred.includes('video.pause()'), 'Closing or restarting must pause the previous playback')
+assert(deferred.includes('video.currentTime = 0'), 'Repeated playback must restart from the beginning')
+assert(deferred.includes('onEnded={resetPlayback}'), 'Completed video must return to a replayable poster state')
 assert(!deferred.includes('autoPlay'), 'Playback must not rely on remount-time autoplay')
 assert(!deferred.includes("if (!requested || status === 'error') return"), 'Poster state must not replace the video element')
 assert(deferred.includes('加载视频'), 'Poster state must have an explicit play action')
 assert(deferred.includes('重新加载'), 'Video failures must expose retry')
-assert(!data.includes('github.com/ygystyrdqd-lab/tingting-portfolio/releases'), 'Videos must use same-origin paths')
-assert((data.match(/\.lite\.mp4/g) || []).length === 6, 'All six portfolio videos must use ultra-low-bandwidth streaming previews')
+assert(data.includes("from '../config/videoAssets'"), 'Work data must import centralized OSS video assets')
+assert((data.match(/videoAssets\./g) || []).length === 6, 'All six videos must use centralized OSS URLs')
+assert(config.includes('VITE_OSS_VIDEO_BASE_URL'), 'OSS base URL must come from the production environment')
+assert(!data.includes('.lite.mp4'), 'Published work data must not use GitHub Pages video paths')
 
 const videos = [
   'public/work/3d-01/video.lite.mp4',
