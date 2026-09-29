@@ -58,7 +58,7 @@ export default function DeferredVideo({ src, poster, title }) {
     <video
       ref={videoRef}
       src={resolvedSrc}
-      poster={poster ? assetUrl(poster) : undefined}
+      poster={poster || undefined}
       preload="none"
       controls={requested}
       playsInline
@@ -69,7 +69,7 @@ export default function DeferredVideo({ src, poster, title }) {
       onEnded={resetPlayback}
     />
     {showPoster && <>
-      {poster && <img src={assetUrl(poster)} alt="" decoding="async" />}
+      {poster && <img src={poster} alt="" decoding="async" />}
       <div className="deferred-video-shade" aria-hidden="true" />
       <button
         type="button"
