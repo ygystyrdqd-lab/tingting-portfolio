@@ -135,7 +135,7 @@ const rawWorkCategories = [
           },
           {
             type: 'video',
-            src: '/work/3d-01/video.web.mp4',
+            src: '/work/3d-01/video.lite.mp4',
             poster: '/work/3d-01/cover.webp',
           },
         ],
@@ -158,7 +158,7 @@ const rawWorkCategories = [
         media: [
           {
             type: 'video',
-            src: '/work/aigc-video-01/video.web.mp4',
+            src: '/work/aigc-video-01/video.lite.mp4',
             poster: '/work/aigc-video-01/cover.webp',
           },
         ],
@@ -171,7 +171,7 @@ const rawWorkCategories = [
         media: [
           {
             type: 'video',
-            src: '/work/aigc-video-02/video.web.mp4',
+            src: '/work/aigc-video-02/video.lite.mp4',
             poster: '/work/aigc-video-02/cover.webp',
           },
         ],
@@ -184,7 +184,7 @@ const rawWorkCategories = [
         media: [
           {
             type: 'video',
-            src: '/work/aigc-video-03/video.web.mp4',
+            src: '/work/aigc-video-03/video.lite.mp4',
             poster: '/work/aigc-video-03/cover.webp',
           },
         ],
@@ -248,7 +248,7 @@ const rawFeaturedWorkCategories = [
         meta: 'AIGC · BEAUTY AD',
         cover: '/work/remeya-cream/cover.jpg',
         media: [
-          { type: 'video', src: '/work/remeya-cream/ad.web.mp4', poster: '/work/remeya-cream/cover.jpg' },
+          { type: 'video', src: '/work/remeya-cream/ad.lite.mp4', poster: '/work/remeya-cream/cover.jpg' },
         ],
       },
     ],
@@ -267,7 +267,7 @@ const rawFeaturedWorkCategories = [
         meta: 'SCIENCE · SHORT FILM',
         cover: '/work/immune-cell-science/cover.webp',
         media: [
-          { type: 'video', src: '/work/immune-cell-science/film.web.mp4', poster: '/work/immune-cell-science/cover.webp' },
+          { type: 'video', src: '/work/immune-cell-science/film.lite.mp4', poster: '/work/immune-cell-science/cover.webp' },
         ],
       },
     ],

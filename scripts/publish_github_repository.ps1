@@ -38,6 +38,24 @@ try {
   $branchRef = Invoke-RestMethod -Uri "$apiRoot/git/ref/heads/main" -Headers $headers
 }
 $parentCommit = $branchRef.object.sha
+$parentCommitData = Invoke-RestMethod -Uri "$apiRoot/git/commits/$parentCommit" -Headers $headers
+$parentTree = Invoke-RestMethod -Uri "$apiRoot/git/trees/$($parentCommitData.tree.sha)?recursive=1" -Headers $headers
+$remoteBlobs = @{}
+foreach ($entry in $parentTree.tree) {
+  if ($entry.type -eq 'blob') { $remoteBlobs[$entry.path] = $entry.sha }
+}
+
+function Get-GitBlobSha {
+  param([Parameter(Mandatory = $true)] [string] $Path)
+
+  $content = [IO.File]::ReadAllBytes($Path)
+  $header = [Text.Encoding]::UTF8.GetBytes("blob $($content.Length)`0")
+  $payload = New-Object byte[] ($header.Length + $content.Length)
+  [Array]::Copy($header, 0, $payload, 0, $header.Length)
+  [Array]::Copy($content, 0, $payload, $header.Length, $content.Length)
+  $sha = [Security.Cryptography.SHA1]::Create().ComputeHash($payload)
+  return ([BitConverter]::ToString($sha)).Replace('-', '').ToLowerInvariant()
+}
 
 $rootFiles = @(
   '.gitignore', '.oxlintrc.json', 'README.md', 'components.json', 'index.html',
@@ -61,13 +79,20 @@ $files = $files | Sort-Object FullName -Unique
 if ($files.Count -lt 1) { throw 'No files selected for publication' }
 
 $tree = [System.Collections.Generic.List[object]]::new()
+$selectedPaths = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 $index = 0
 foreach ($file in $files) {
   $index += 1
   $relativePath = [System.IO.Path]::GetRelativePath($resolvedRoot, $file.FullName).Replace('\', '/')
   if ($relativePath -in $externalMediaPaths) { continue }
+  $selectedPaths.Add($relativePath) | Out-Null
   if ($relativePath -match '(^|/)(\.env|node_modules|dist|\.git|\.superpowers)(/|$|\.)') {
     throw "Blocked path selected: $relativePath"
+  }
+  $localSha = Get-GitBlobSha -Path $file.FullName
+  if ($remoteBlobs.ContainsKey($relativePath) -and $remoteBlobs[$relativePath] -eq $localSha) {
+    Write-Output "REUSED $index/$($files.Count): $relativePath"
+    continue
   }
   $content = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($file.FullName))
   $blob = Invoke-GitHubJson -Method Post -Uri "$apiRoot/git/blobs" -Body @{ content = $content; encoding = 'base64' }
@@ -75,7 +100,25 @@ foreach ($file in $files) {
   Write-Output "UPLOADED $index/$($files.Count): $relativePath"
 }
 
-$createdTree = Invoke-GitHubJson -Method Post -Uri "$apiRoot/git/trees" -Body @{ tree = $tree }
+foreach ($remotePath in $remoteBlobs.Keys) {
+  $isManagedRootFile = $remotePath -in $rootFiles
+  $isManagedDirectory = $false
+  foreach ($directory in $rootDirectories) {
+    if ($remotePath.StartsWith("$directory/", [StringComparison]::Ordinal)) {
+      $isManagedDirectory = $true
+      break
+    }
+  }
+  if (($isManagedRootFile -or $isManagedDirectory) -and -not $selectedPaths.Contains($remotePath)) {
+    $tree.Add(@{ path = $remotePath; mode = '100644'; type = 'blob'; sha = $null })
+    Write-Output "REMOVED: $remotePath"
+  }
+}
+
+$createdTree = Invoke-GitHubJson -Method Post -Uri "$apiRoot/git/trees" -Body @{
+  base_tree = $parentCommitData.tree.sha
+  tree = $tree
+}
 $profile = Invoke-RestMethod -Uri 'https://api.github.com/user' -Headers $headers
 $authorName = if ($profile.name) { $profile.name } else { $profile.login }
 $authorEmail = "$($profile.id)+$($profile.login)@users.noreply.github.com"

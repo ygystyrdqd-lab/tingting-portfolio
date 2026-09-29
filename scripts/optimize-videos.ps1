@@ -8,15 +8,15 @@ $ErrorActionPreference = 'Stop'
 $sourceRootPath = [IO.Path]::GetFullPath($SourceRoot)
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $jobs = @(
-  @{ Source = '作品/4三维视觉/面霜视频终.mp4'; Destination = 'public/work/3d-01/video.mp4'; Streaming = 'public/work/3d-01/video.web.mp4' },
-  @{ Source = '作品/5AIGC视频广告/精华液广告.mp4'; Destination = 'public/work/aigc-video-01/video.mp4'; Streaming = 'public/work/aigc-video-01/video.web.mp4' },
-  @{ Source = '作品/5AIGC视频广告/精华液广告2.mp4'; Destination = 'public/work/aigc-video-02/video.mp4'; Streaming = 'public/work/aigc-video-02/video.web.mp4' },
-  @{ Source = '作品/5AIGC视频广告/投影仪广告.mp4'; Destination = 'public/work/aigc-video-03/video.mp4'; Streaming = 'public/work/aigc-video-03/video.web.mp4' },
-  @{ Source = '项目/瑞美亚面霜广告.mp4'; Destination = 'public/work/remeya-cream/ad.mp4'; Streaming = 'public/work/remeya-cream/ad.web.mp4' },
-  @{ Source = '免疫细胞科普（身体里的接力赛）/免疫细胞科普短片 (1).mp4'; Destination = 'public/work/immune-cell-science/film.mp4'; Streaming = 'public/work/immune-cell-science/film.web.mp4' }
+  @{ Source = '作品/4三维视觉/面霜视频终.mp4'; Destination = 'public/work/3d-01/video.mp4'; Streaming = 'public/work/3d-01/video.lite.mp4' },
+  @{ Source = '作品/5AIGC视频广告/精华液广告.mp4'; Destination = 'public/work/aigc-video-01/video.mp4'; Streaming = 'public/work/aigc-video-01/video.lite.mp4' },
+  @{ Source = '作品/5AIGC视频广告/精华液广告2.mp4'; Destination = 'public/work/aigc-video-02/video.mp4'; Streaming = 'public/work/aigc-video-02/video.lite.mp4' },
+  @{ Source = '作品/5AIGC视频广告/投影仪广告.mp4'; Destination = 'public/work/aigc-video-03/video.mp4'; Streaming = 'public/work/aigc-video-03/video.lite.mp4' },
+  @{ Source = '项目/瑞美亚面霜广告.mp4'; Destination = 'public/work/remeya-cream/ad.mp4'; Streaming = 'public/work/remeya-cream/ad.lite.mp4' },
+  @{ Source = '免疫细胞科普（身体里的接力赛）/免疫细胞科普短片 (1).mp4'; Destination = 'public/work/immune-cell-science/film.mp4'; Streaming = 'public/work/immune-cell-science/film.lite.mp4' }
 )
 $scale = "scale='if(gte(iw,ih),min(iw,1920),-2)':'if(gte(iw,ih),-2,min(ih,1920))'"
-$streamingScale = "scale='if(gte(iw,ih),min(iw,960),-2)':'if(gte(iw,ih),-2,min(ih,960))'"
+$streamingScale = "scale='if(gte(iw,ih),min(iw,640),-2)':'if(gte(iw,ih),-2,min(ih,640))'"
 
 function Assert-WithinRoot {
   param(
@@ -103,10 +103,10 @@ foreach ($job in $jobs) {
   $streamingArgs = @(
     '-hide_banner', '-y', '-i', $destination,
     '-map', '0:v:0', '-map', '0:a?',
-    '-vf', $streamingScale, '-fpsmax', '24',
-    '-c:v', 'libx264', '-preset', 'slow', '-b:v', '360k', '-maxrate', '420k', '-bufsize', '840k',
-    '-profile:v', 'main', '-level', '3.1', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
-    '-c:a', 'aac', '-b:a', '64k',
+    '-vf', $streamingScale, '-fpsmax', '15',
+    '-c:v', 'libx264', '-preset', 'slow', '-b:v', '110k', '-maxrate', '140k', '-bufsize', '280k',
+    '-profile:v', 'baseline', '-level', '3.0', '-pix_fmt', 'yuv420p', '-g', '30', '-movflags', '+faststart',
+    '-c:a', 'aac', '-b:a', '32k',
     $streamingOutput
   )
   & ffmpeg @streamingArgs
@@ -127,10 +127,10 @@ foreach ($job in $jobs) {
 
   if ($streamVideo.codec_name -ne 'h264') { throw "Unexpected streaming codec for $($job.Source): $($streamVideo.codec_name)" }
   if ($streamVideo.pix_fmt -ne 'yuv420p') { throw "Unexpected streaming pixel format for $($job.Source): $($streamVideo.pix_fmt)" }
-  if ([Math]::Max([int]$streamVideo.width, [int]$streamVideo.height) -gt 960) { throw "Streaming output exceeds 540p limit: $($job.Source)" }
-  if ($streamFps -gt 24.01) { throw "Streaming output exceeds 24fps: $($job.Source)" }
+  if ([Math]::Max([int]$streamVideo.width, [int]$streamVideo.height) -gt 640) { throw "Streaming output exceeds 360p limit: $($job.Source)" }
+  if ($streamFps -gt 15.01) { throw "Streaming output exceeds 15fps: $($job.Source)" }
   if ([double]$streamProbe.format.duration -le 0) { throw "Streaming output has invalid duration: $($job.Source)" }
-  if ([double]$streamProbe.format.bit_rate -gt 520000) { throw "Streaming output exceeds 520kbps: $($job.Source)" }
+  if ([double]$streamProbe.format.bit_rate -gt 190000) { throw "Streaming output exceeds 190kbps: $($job.Source)" }
   if (-not (Test-FastStart -Path $streamingOutput)) { throw "Streaming output is missing a leading moov atom: $($job.Source)" }
 
   Move-Item -LiteralPath $streamingOutput -Destination $streaming -Force
