@@ -172,7 +172,7 @@ const rawWorkCategories = [
         media: [
           {
             type: 'video',
-            src: videoAssets.serum02,
+            src: videoAssets.projector,
             poster: '/work/aigc-video-02/cover.webp',
           },
         ],
@@ -185,7 +185,7 @@ const rawWorkCategories = [
         media: [
           {
             type: 'video',
-            src: videoAssets.projector,
+            src: videoAssets.serum02,
             poster: '/work/aigc-video-03/cover.webp',
           },
         ],

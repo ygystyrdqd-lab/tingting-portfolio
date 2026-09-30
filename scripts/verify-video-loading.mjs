@@ -35,6 +35,12 @@ assert(deferred.includes('<img src={poster}'), 'Poster image must use the alread
 assert(!deferred.includes('assetUrl(poster)'), 'DeferredVideo must not resolve poster URLs twice')
 assert(data.includes("from '../config/videoAssets'"), 'Work data must import centralized OSS video assets')
 assert((data.match(/videoAssets\./g) || []).length === 6, 'All six videos must use centralized OSS URLs')
+const aocProject = data.match(/id: 'aigc-video-02'[\s\S]*?\n      },/)?.[0] ?? ''
+const serumTwoProject = data.match(/id: 'aigc-video-03'[\s\S]*?\n      },/)?.[0] ?? ''
+assert(aocProject.includes("title: 'AOC激光投影广告'"), 'AOC project title must stay on aigc-video-02')
+assert(aocProject.includes('src: videoAssets.projector'), 'AOC project must use the projector video')
+assert(serumTwoProject.includes("title: '瑞美亚精华液广告2'"), 'Serum ad 2 title must stay on aigc-video-03')
+assert(serumTwoProject.includes('src: videoAssets.serum02'), 'Serum ad 2 must use the serum02 video')
 assert(config.includes('VITE_OSS_VIDEO_BASE_URL'), 'OSS base URL must come from the production environment')
 assert(!data.includes('.lite.mp4'), 'Published work data must not use GitHub Pages video paths')
 
